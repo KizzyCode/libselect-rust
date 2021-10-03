@@ -7,7 +7,8 @@ platform:
   - x86_64-pc-windows-msvc
   - i686-pc-windows-msvc
   - x86_64-pc-windows-gnu
-  - i686-pc-windows-gnu
+  # Disable i686-pc-windows-gnu (it's a mostly obsolete anyway)
+  # - i686-pc-windows-gnu
   - x86_64-unknown-linux-gnu
   - x86_64-apple-darwin
 
@@ -44,32 +45,16 @@ for:
       - cargo test --verbose --no-default-features %CONFIGURATION%
       - cargo test --verbose --release --no-default-features %CONFIGURATION%
   
-  # Windows-gnu64 specific build settings
+  # Windows-gnu specific build settings
   - matrix:
       only:
         - platform: x86_64-pc-windows-gnu
-    environment:
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-    install:
-      - choco install mingw
-      - set PATH=%PATH%;C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin
-      - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
-      - rustup-init.exe -y --default-host "%PLATFORM%"
-      - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
-    test_script:
-      - cargo test --verbose --no-default-features %CONFIGURATION%
-      - cargo test --verbose --release --no-default-features %CONFIGURATION%
-
-  # Windows-gnu32 specific build settings
-  - matrix:
-      only:
         - platform: i686-pc-windows-gnu
     environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     install:
       - choco install mingw
       - set PATH=%PATH%;C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin
-      - set CC=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\x86_64-w64-mingw32-gcc.exe
       - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
       - rustup-init.exe -y --default-host "%PLATFORM%"
       - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
