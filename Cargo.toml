@@ -1,0 +1,34 @@
+[package]
+name = "libselect"
+version = "0.1.0"
+edition = "2018"
+authors = ["KizzyCode Software Labs./Keziah Biermann <development@kizzycode.de>"]
+keywords = []
+categories = []
+description = "This crate provides a high-level APIs to perform `select`-operations on I/O handles"
+license = "BSD-2-Clause OR MIT"
+repository = "https://github.com/KizzyCode/libselect-rust"
+readme = "README.md"
+build = "build.rs"
+
+
+[badges]
+appveyor = { repository = "KizzyCode/libselect-rust" }
+
+
+[features]
+default = []
+
+
+[dependencies]
+ebacktrace = "0.3"
+
+[build-dependencies]
+cc = "1.0"
+
+
+[profile.release]
+overflow-checks = true
+
+[profile.bench]
+overflow-checks = true
