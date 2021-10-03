@@ -10,8 +10,8 @@
 # `libselect`
 Welcome to `libselect` 🎉
 
+This crate provides a high-level APIs to perform `select`-operations on I/O-handles.
 
-## Example
-```rust
-panic!("FIXME");
-```
+`libselect` uses Rust's [`AsRawFd`](https://doc.rust-lang.org/stable/std/os/unix/io/trait.AsRawFd.html) /
+[`AsRawSocket`](https://doc.rust-lang.org/stable/std/os/windows/io/trait.AsRawSocket.html) on windows and works with all
+I/O-handles that expose raw file descriptors.
