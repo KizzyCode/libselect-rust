@@ -53,7 +53,7 @@ impl<T> AsInOutHandle for T where T: std::os::unix::io::AsRawFd {
     }
 }
 #[cfg(target_family = "windows")]
-impl<T> InOutHandle for T where T: std::os::windows::io::AsRawSocket {
+impl<T> AsInOutHandle for T where T: std::os::windows::io::AsRawSocket {
     fn as_io_handle(&self) -> Result<InOutHandle> {
         let raw_fd = self.as_raw_socket();
         let fd = u64::try_from(raw_fd).map_err(|e| einval!("Invalid file descriptor: {} ({})", raw_fd, e))?;
