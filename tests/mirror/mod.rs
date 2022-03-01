@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use std::{
     mem, thread,
     io::{ Read, Write },
@@ -24,9 +22,9 @@ pub struct MirrorServer {
 }
 impl MirrorServer {
     /// Starts a server and returns the input queue and a connected TCP stream
-    pub fn new() -> (SyncSender<Message>, TcpStream) {
+    pub fn spawn() -> (SyncSender<Message>, TcpStream) {
         // Create the listener
-        let mut ports = (10_000..=65_535).into_iter();
+        let mut ports = 10_000..=65_535;
         let (listener, port) = 'bind_loop: loop {
             // Iterate over the ports
             let port = ports.next().expect("No free port available to bind to");

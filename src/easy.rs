@@ -1,65 +1,55 @@
+//! Implements a few high-level wrappers around `select`
+
 use crate::{
-    error::Result, io_handle::InOutHandle,
-    select_impl::{ self, SelectSet, Events }
+    error::Result, io::AsInOutHandle,
+    select::{ self, Event }
 };
 use std::time::Duration;
 
 
 /// Performs a `select` call with the given `handles` for the given `events` and returns the handles for which an event has
 /// occurred
-pub fn select_event<'a, T, TE>(handles: T, events: Events, timeout: Duration) -> Result<Vec<(TE, Events)>>
-    where T: IntoIterator<Item = TE>, TE: InOutHandle
+fn select_event<'a, I, IT>(handles: I, read: bool, write: bool, exception: bool, timeout: Duration)
+    -> Result<Vec<Event<'a>>> where I: IntoIterator<Item = &'a IT>, IT: AsInOutHandle + 'a
 {
     // Collect the handles
-    let handles: Vec<_> = handles.into_iter().collect();
-    
-    // Create the select set
-    let mut select_set = SelectSet::new();
-    for handle in handles.iter() {
-        select_set.insert(handle, events)?;
-    }
-    select_impl::select(&mut select_set, timeout)?;
-
-    // Call select and return the handles where an event occurred
-    let mut with_event = Vec::new();
+    let mut event_handles = Vec::new();
     for handle in handles {
-        // Get the events for the handle
-        let events = select_set.get(&handle)
-            .expect("Failed to get file descriptor from valid handle?!")
-            .expect("Missing handle in select set?!");
-        if events.has_event() {
-            with_event.push((handle, *events))
-        }
+        let event_handle = Event::new(handle, read, write, exception)?;
+        event_handles.push(event_handle);
     }
-    Ok(with_event)
+    
+    // Call select and return the handles where an event occurred
+    let event_handles = select::select(event_handles, timeout)?;
+    let events = event_handles.into_iter()
+        .filter(|e| e.has_event())
+        .collect();
+    Ok(events)
 }
 
 
 /// Performs a `select` call with the given `handles` for read- and exception-events and returns the handles for which an
 /// event has occurred
-pub fn select_read<'a, T, TE>(handles: T, timeout: Duration) -> Result<Vec<(TE, Events)>>
-    where T: IntoIterator<Item = TE>, TE: InOutHandle
+pub fn select_read<'a, I, IT>(handles: I, timeout: Duration) -> Result<Vec<Event<'a>>>
+    where I: IntoIterator<Item = &'a IT>, IT: AsInOutHandle + 'a
 {
-    let events = Events { read: true, write: false, exception: true };
-    select_event(handles, events, timeout)
+    select_event(handles, true, false, true, timeout)
 }
 
 
 /// Performs a `select` call with the given `handles` for write- and exception-events and returns the handles for which an
 /// event has occurred
-pub fn select_write<'a, T, TE>(handles: T, timeout: Duration) -> Result<Vec<(TE, Events)>>
-    where T: IntoIterator<Item = TE>, TE: InOutHandle
+pub fn select_write<'a, I, IT>(handles: I, timeout: Duration) -> Result<Vec<Event<'a>>>
+    where I: IntoIterator<Item = &'a IT>, IT: AsInOutHandle + 'a
 {
-    let events = Events { read: false, write: true, exception: true };
-    select_event(handles, events, timeout)
+    select_event(handles, false, true, true, timeout)
 }
 
 
 /// Performs a `select` call with the given `handles` for read-, write- and exception-events and returns the handles for
 /// which an event has occurred
-pub fn select_readwrite<'a, T, TE>(handles: T, timeout: Duration) -> Result<Vec<(TE, Events)>>
-    where T: IntoIterator<Item = TE>, TE: InOutHandle
+pub fn select_readwrite<'a, I, IT>(handles: I, timeout: Duration) -> Result<Vec<Event<'a>>>
+    where I: IntoIterator<Item = &'a IT>, IT: AsInOutHandle + 'a
 {
-    let events = Events { read: true, write: true, exception: true };
-    select_event(handles, events, timeout)
+    select_event(handles, true, true, true, timeout)
 }

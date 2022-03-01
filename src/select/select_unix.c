@@ -1,27 +1,13 @@
 // Includes
-#include <stdint.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "select.h"
 
 
-/// A libselect filedescriptor struct
-struct libselect_fd {
-    /// The file descriptor handle to operate on
-    uint64_t handle;
-    /// A flag for the `read`-event
-    uint8_t read;
-    /// A flag for the `write`-event
-    uint8_t write;
-    /// A flag for an exceptional event
-    uint8_t exception;
-};
-
-
-/// Calls `select` with the given `fds`
 int libselect_select(struct libselect_fd* fds, size_t fds_len, uint64_t timeout_ms) {
     // Validate the input
     if (fds == NULL) {
@@ -67,27 +53,26 @@ int libselect_select(struct libselect_fd* fds, size_t fds_len, uint64_t timeout_
     for (size_t i = 0; i < fds_len; i++) {
         // Reset event flags
         struct libselect_fd* fd = fds + i;
-        fd->read = 0;
-        fd->write = 0;
-        fd->exception = 0;
+        fd->read = false;
+        fd->write = false;
+        fd->exception = false;
         
         // Update the event flags
         if (FD_ISSET((int)fd->handle, &read_set)) {
-            fd->read = 1;
+            fd->read = true;
         }
         if (FD_ISSET((int)fd->handle, &write_set)) {
-            fd->write = 1;
+            fd->write = true;
         }
         if (FD_ISSET((int)fd->handle, &exception_set)) {
-            fd->exception = 1;
+            fd->exception = true;
         }
     }
     return 0;
 }
 
 
-/// Sets the blocking mode for the given FD
-int set_blocking(uint64_t fd, uint8_t blocking) {
+int set_blocking(uint64_t fd, bool blocking) {
     // Reset errno
     errno = 0;
 

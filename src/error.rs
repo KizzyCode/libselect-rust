@@ -1,3 +1,5 @@
+//! Implements the error types
+
 use ebacktrace::define_error;
 use std::{
     io, error, result,
@@ -6,14 +8,17 @@ use std::{
 
 
 /// Creates a new variant
+#[doc(hidden)]
 #[macro_export] macro_rules! e {
     ($kind:expr, $($arg:tt)*) => ({ $crate::error::ErrorImpl::with_string($kind, format!($($arg)*)) })
 }
 /// Creates a new `ErrorImpl::InOutError` kind
+#[doc(hidden)]
 #[macro_export] macro_rules! eio {
     ($($arg:tt)*) => ({ e!($crate::error::ErrorKind::InOutError, $($arg)*) });
 }
 /// Creates a new `ErrorImpl::InvalidValue` kind
+#[doc(hidden)]
 #[macro_export] macro_rules! einval {
     ($($arg:tt)*) => ({ e!($crate::error::ErrorKind::InvalidValue, $($arg)*) });
 }

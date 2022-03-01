@@ -1,7 +1,7 @@
 [package]
 name = "libselect"
-version = "0.1.0"
-edition = "2018"
+version = "0.2.0"
+edition = "2021"
 authors = ["KizzyCode Software Labs./Keziah Biermann <development@kizzycode.de>"]
 keywords = []
 categories = []
@@ -21,7 +21,7 @@ default = []
 
 
 [dependencies]
-ebacktrace = "0.3"
+ebacktrace = "0.4"
 
 [build-dependencies]
 cc = "1.0"

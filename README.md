@@ -4,7 +4,7 @@
 [![docs.rs](https://docs.rs/libselect/badge.svg)](https://docs.rs/libselect)
 [![crates.io](https://img.shields.io/crates/v/libselect.svg)](https://crates.io/crates/libselect)
 [![Download numbers](https://img.shields.io/crates/d/libselect.svg)](https://crates.io/crates/libselect)
-[![dependency status](https://deps.rs/crate/libselect/0.1.0/status.svg)](https://deps.rs/crate/libselect/0.1.0)
+[![dependency status](https://deps.rs/crate/libselect/0.2.0/status.svg)](https://deps.rs/crate/libselect/0.2.0)
 
 
 # `libselect`

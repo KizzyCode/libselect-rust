@@ -1,18 +1,17 @@
 mod mirror;
 
 use mirror::MirrorServer;
-use libselect::select_impl::Events;
 use std::time::Duration;
 
 
-/// A duration of one second
+/// A duration of two seconds
 const DURATION_2S: Duration = Duration::from_secs(2);
 
 
 #[test]
 fn test_read() {
     // Start the mirror server
-    let (mut queue, mut stream) = MirrorServer::new();
+    let (mut queue, mut stream) = MirrorServer::spawn();
 
     // Call select
     let events = libselect::select_read([&stream], DURATION_2S).expect("Failed to call select");
@@ -23,8 +22,8 @@ fn test_read() {
     let events = libselect::select_read([&stream], DURATION_2S).expect("Failed to call select");
     
     // Call select and wait for read event
-    let (_, event) = events.first().expect("Missing expected event on socket");
-    assert_eq!(event, &Events { read: true, write: false, exception: false });
+    let event = events.first().expect("Missing expected event on socket");
+    assert!(event.has_read());
 
     // Read the message
     let message = MirrorServer::receive_message(&mut stream);
